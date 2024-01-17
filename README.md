@@ -1,6 +1,6 @@
 # BATTLE: Unsupervised Bi-Level Optimization with Implicit Relationship Mining for Anomaly Detection on Attributed Networks
 
-This is the source code of IJCAI-2024 paper "[BATTLE: Unsupervised Bi-Level Optimization with Implicit Relationship Mining for Anomaly Detection on Attributed Networks]. 
+This is the source code of IJCAI-2024 paper "BATTLE: Unsupervised Bi-Level Optimization with Implicit Relationship Mining for Anomaly Detection on Attributed Networks." 
 
 ![The proposed framework](framework.png)
 
