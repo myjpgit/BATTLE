@@ -255,12 +255,6 @@ class Experiment:
         validation_accuracies = []
         test_precision_50 = []
         test_recall_50 = []
-        test_precision_100 = []
-        test_recall_100 = []
-        test_precision_200 = []
-        test_recall_200 = []
-        test_precision_300 = []
-        test_recall_300 = []
 
         for trial in range(args.ntrials):
 
@@ -362,19 +356,9 @@ class Experiment:
                 auc = evaluate_AUC(torch.tensor(outlier_scores), torch.tensor(labels))
                 precision50 = evaluate_precision(torch.tensor(outlier_scores), torch.tensor(labels), 50)
                 recall50 = evaluate_recall(torch.tensor(outlier_scores), torch.tensor(labels), 50)
-                precision100 = evaluate_precision(torch.tensor(outlier_scores), torch.tensor(labels), 100)
-                recall100 = evaluate_recall(torch.tensor(outlier_scores), torch.tensor(labels), 100)
-                precision200 = evaluate_precision(torch.tensor(outlier_scores), torch.tensor(labels), 200)
-                recall200 = evaluate_recall(torch.tensor(outlier_scores), torch.tensor(labels), 200)
-                precision300 = evaluate_precision(torch.tensor(outlier_scores), torch.tensor(labels), 300)
-                recall300 = evaluate_recall(torch.tensor(outlier_scores), torch.tensor(labels), 300)
 
-                # Structure Bootstrapping (大改)
-                #(new_embedding 计算每条边的概率（ai,j = sigmoid(zi, zj)）然后在原始图中删除得分最低的n条边)
                 if (1 - args.tau) and (args.c == 0 or epoch % args.c == 0):
                     if args.sparse:
-                        # delete_anomaly_adj = self.delete_anomaly(new_embedding, edge_index, adj_original)
-                        # delete_anomaly_adj_torch_sparse = dgl_graph_to_torch_sparse(delete_anomaly_adj)
                         learned_adj_torch_sparse = dgl_graph_to_torch_sparse(Adj)
                         anchor_local_Anomaly_adj_torch_sparse = anchor_local_Anomaly_adj_torch_sparse * args.tau \
                                                   + learned_adj_torch_sparse * (1 - args.tau)
@@ -385,19 +369,11 @@ class Experiment:
                         anchor_Global_Anomaly_adj = torch_sparse_to_dgl_graph(anchor_Global_Anomaly_adj_torch_sparse)
 
                     else:
-                        # delete_anomaly_adj = self.delete_anomaly(new_embedding, edge_index, adj_original)
-                        # delete_anomaly_topological_adj = self.delete_anomaly(anchor_topological_Anomaly_adj_embedding, edge_index, adj_original)
-                        # delete_anomaly_EdgeAttr_adj = self.delete_anomaly(anchor_EdgeAttr_Anomaly_adj_embedding, edge_index, adj_original)
-
-                        # delete_anomaly_topological_adj = normalize(delete_anomaly_topological_adj, 'sym', args.sparse)
-                        # delete_anomaly_EdgeAttr_adj = normalize(delete_anomaly_EdgeAttr_adj, 'sym', args.sparse)
-
                         anchor_local_Anomaly_adj = anchor_local_Anomaly_adj * args.tau + Adj.detach() * (1 - args.tau)
                         anchor_Global_Anomaly_adj = anchor_Global_Anomaly_adj * args.tau + Adj.detach() * (1 - args.tau)
-                        # anchor_EdgeAttr_Anomaly_adj = anchor_EdgeAttr_Anomaly_adj * args.tau + Adj.detach() * (1 - args.tau)
 
                 print("Epoch {:05d} | Upper Loss {:.4f} | Lower Loss {:.4f}".format(epoch, loss_Upper.item(), loss_Lower.item()))
-                print("Test_AUC {:.4f} | Test_precision_50 {:.4f} | Test_recall_50 {:.4f} | Test_precision_100 {:.4f} | Test_recall_100 {:.4f} | Test_precision_200 {:.4f} | Test_recall_200 {:.4f} | Test_precision_300 {:.4f} | Test_recall_300 {:.4f}".format(auc, precision50, recall50, precision100, recall100, precision200, recall200, precision300, recall300))
+                print("Test_AUC {:.4f} | Test_precision_50 {:.4f} | Test_recall_50 {:.4f}".format(auc, precision50, recall50))
 
 
                 if auc > best_val_test:
@@ -406,69 +382,31 @@ class Experiment:
                     # best_val = val_auc
                     best_precision_test_50 = precision50
                     best_recall_test_50 = recall50
-                if precision100 > best_precision_test_100:
-                    best_precision_test_100 = precision100
-                    best_recall_test_100 = recall100
-                if precision200 > best_precision_test_200:
-                    best_precision_test_200 = precision200
-                    best_recall_test_200 = recall200
-                if precision300 > best_precision_test_300:
-                    best_precision_test_300 = precision300
-                    best_recall_test_300 = recall300
-                    best_epoch = epoch
 
             if args.downstream_task == 'classification':
                 # validation_accuracies.append(best_val.item())
                 test_accuracies.append(best_val_test.item())
                 test_precision_50.append(best_precision_test_50.item())
                 test_recall_50.append(best_recall_test_50.item())
-                test_precision_100.append(best_precision_test_100.item())
-                test_recall_100.append(best_recall_test_100.item())
-                test_precision_200.append(best_precision_test_200.item())
-                test_recall_200.append(best_recall_test_200.item())
-                test_precision_300.append(best_precision_test_300.item())
-                test_recall_300.append(best_recall_test_300.item())
                 print("Trial: ", trial + 1)
                 # print("Best val ACC: ", best_val.item())
                 print("Best test ACC: ", best_val_test.item())
                 print("Best test Precision@50: ", best_precision_test_50.item())
                 print("Best test Recall@50: ", best_recall_test_50.item())
-                print("Best test Precision@100: ", best_precision_test_100.item())
-                print("Best test Recall@100: ", best_recall_test_100.item())
-                print("Best test Precision@200: ", best_precision_test_200.item())
-                print("Best test Recall@200: ", best_recall_test_200.item())
-                print("Best test Precision@300: ", best_precision_test_300.item())
-                print("Best test Recall@300: ", best_recall_test_300.item())
-            elif args.downstream_task == 'clustering':
-                print("Final ACC: ", acc)
-                print("Final NMI: ", nmi)
-                print("Final F-score: ", f1)
-                print("Final ARI: ", ari)
 
         if args.downstream_task == 'classification' and trial != 0:
-            self.print_results(test_accuracies, test_precision_50, test_recall_50, test_precision_100, test_recall_100, test_precision_200, test_recall_200, test_precision_300, test_recall_300)
+            self.print_results(test_accuracies, test_precision_50, test_recall_50)
 
 
-    def print_results(self, test_accu, test_pre_50, test_re_50, test_pre_100, test_re_100, test_pre_200, test_re_200, test_pre_300, test_re_300):
+    def print_results(self, test_accu, test_pre_50, test_re_50):
         # s_val = "Val accuracy: {:.4f} +/- {:.4f}".format(np.mean(validation_accu), np.std(validation_accu))
         s_test = "Test accuracy: {:.4f} +/- {:.4f}".format(np.mean(test_accu),np.std(test_accu))
         s_pre_50 = "Test precision@50: {:.4f} +/- {:.4f}".format(np.mean(test_pre_50),np.std(test_pre_50))
         s_recall_50 = "Test recall@50: {:.4f} +/- {:.4f}".format(np.mean(test_re_50),np.std(test_re_50))
-        s_pre_100 = "Test precision@100: {:.4f} +/- {:.4f}".format(np.mean(test_pre_100),np.std(test_pre_100))
-        s_recall_100 = "Test recall@100: {:.4f} +/- {:.4f}".format(np.mean(test_re_100),np.std(test_re_100))
-        s_pre_200 = "Test precision@200: {:.4f} +/- {:.4f}".format(np.mean(test_pre_200),np.std(test_pre_200))
-        s_recall_200 = "Test recall@200: {:.4f} +/- {:.4f}".format(np.mean(test_re_200),np.std(test_re_200))
-        s_pre_300 = "Test precision@300: {:.4f} +/- {:.4f}".format(np.mean(test_pre_300),np.std(test_pre_300))
-        s_recall_300 = "Test recall@300: {:.4f} +/- {:.4f}".format(np.mean(test_re_300),np.std(test_re_300))
         print(s_test)
         print(s_pre_50)
         print(s_recall_50)
-        print(s_pre_100)
-        print(s_recall_100)
-        print(s_pre_200)
-        print(s_recall_200)
-        print(s_pre_300)
-        print(s_recall_300)
+
 
 
 if __name__ == '__main__':
