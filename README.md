@@ -32,10 +32,6 @@ bash BlogCatalog_Bilevel.sh
 ```
 bash Flickr_Bilevel.sh
 ```
-\[ACM\]ACM @ Bilevel_optimization:
-```
-bash ACM_Bilevel.sh
-```
 \[BlogCatalog\]BlogCatalog @ Alter_optimization:
 ```
 bash BlogCatalog_Alter.sh
@@ -43,8 +39,4 @@ bash BlogCatalog_Alter.sh
 \[Flickr\]Flickr @ Alter_optimization:
 ```
 bash Flickr_Alter.sh
-```
-\[ACM\]ACM @ Alter_optimization:
-```
-bash ACM_Alter.sh
 ```
