@@ -1,6 +1,6 @@
-# BATTLE: Unsupervised Bi-Level Optimization with lmplicit Relationship Mining for Attributed Graph Anomaly Detection
+# UBOA: Unsupervised Bi-Level Optimization for Attributed Graph Anomaly Detection
 
-This is the source code of WWW-2025 paper "[BATTLE: Unsupervised Bi-Level Optimization with lmplicit Relationship Mining for Attributed Graph Anomaly Detection]. 
+This is the source code of KDD-2025 paper "[UBOA: Unsupervised Bi-Level Optimization for Attributed Graph Anomaly Detection]. 
 
 ![The proposed framework](framework.png)
 
